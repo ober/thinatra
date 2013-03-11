@@ -38,11 +38,18 @@
 
 (defun th-controller-test1 (path)
   (let ((parms (th-parse-path path "/test1/:a/:b/:c/:d")))
-    (message (format "We Be in th-controller-test1: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
+    (message (format "We Be in th-controller-test1: and got got %s a:%s b:%s" path (th-v 'a) (th-v 'b)))))
 
 (defun th-controller-test2 (path)
   (let ((parms (th-parse-path path "/test2/:a/:b/:c/:d")))
-    (message (format "We Be in thd-controller-test2: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
+    (message (format "We Be in thd-controller-test2: and got got %s a:%s b:%s" path (th-v 'a) (th-v 'b)))))
+
+(defun th-controller-sum (path)
+  (let ((parms (th-parse-path path "/sum/:a/:b")))
+    (message
+     (format "%i"
+             (+ (string-to-number (th-v 'a))
+                (string-to-number (th-v 'b)))))))
 
 (defun th-controller-pwgen (path)
   "open http://localhost:8028/pwgen to get a random password each time"
@@ -71,7 +78,7 @@
        (string-match "[0-9]" (substring results 0 len))
        (string-match "[A-Z]" (substring results 0 len))
        (string-match "^[a-z]" (substring results 0 len)))))
-  (sgp-generate  (random 1000000) (random 1000000)))
+  (message (format "<h1>%s</h1>" (sgp-generate  (random 1000000) (random 1000000)))))
 
 ;; End of Examples
 
@@ -96,7 +103,7 @@
   (th-get-value-by-name path "/:controller/" 'controller))
 
 (defun th-v (i)
-  "Small function to help cleanup the templates"
+  "Syntactic sugar"
   (cdr (assoc i parms))
   )
 
