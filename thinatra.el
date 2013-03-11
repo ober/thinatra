@@ -37,20 +37,41 @@
 ;; e.g.
 
 (defun th-controller-test1 (path)
-  (let ((parms (instantiate-url path "/test1/:a/:b/:c/:d")))
+  (let ((parms (th-parse-path path "/test1/:a/:b/:c/:d")))
     (message (format "We Be in th-controller-test1: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
 
 (defun th-controller-test2 (path)
-  (let ((parms (instantiate-url path "/test2/:a/:b/:c/:d")))
+  (let ((parms (th-parse-path path "/test2/:a/:b/:c/:d")))
     (message (format "We Be in thd-controller-test2: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
 
-(require 'supergenpass)
 (defun th-controller-pwgen (path)
+  "open http://localhost:8028/pwgen to get a random password each time"
 
-v
-  )
+  ;; Following functions taken from http://github.com/ober/sgpass
+  (defun b64-md5 (pickle)
+    "Encrypt the string given to us as Base64 encoded Md5 byte stream"
+    (replace-regexp-in-string "=" "A" (replace-regexp-in-string "+" "9" (replace-regexp-in-string "/" "8" (base64-encode-string (secure-hash 'md5 pickle nil nil t))))))
 
+  (defun sgp-generate (password domain)
+    "Create a unique password for a given domain and master password"
+    (let ((i 0) (results (format "%s:%s" password domain)))
+      (setq results (format "%s:%s" password domain))
+      (while
+          (not (and (> i 9) (secure-enough results 10)))
+        (setq results (b64-md5 results))
+        (setq i (1+ i)))
+      (substring results 0 10)))
 
+  (defun secure-enough (results len)
+    "Ensure the password we have is sufficiently secure"
+    (let
+        ((case-fold-search nil))
+      (and
+       (> (length results) len)
+       (string-match "[0-9]" (substring results 0 len))
+       (string-match "[A-Z]" (substring results 0 len))
+       (string-match "^[a-z]" (substring results 0 len)))))
+  (sgp-generate  (random 1000000) (random 1000000)))
 
 ;; End of Examples
 
@@ -81,7 +102,7 @@ v
 
 (defun th-get-value-by-name (path pattern name)
   "Return the entry if we find it, otherwise nil"
-  (cdr (assoc name (instantiate-url path pattern))))
+  (cdr (assoc name (th-parse-path path pattern))))
 
 (defun th-parse-path (path pattern)
   (let* ((lst (split-string pattern "/" t))
