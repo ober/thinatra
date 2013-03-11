@@ -29,48 +29,61 @@
 
 ;; Many thanks to freenode #emacs and nicferrier for an awesome
 ;; framework on elisp.
-;; Nic also provided initial instantiate-url function
+;; Nic also provided initial th-parse-path function
 
 ;;; Code:
 
+;; Example Functions that handle calls to rest endpoints
+;; e.g.
+
+(defun th-controller-test1 (path)
+  (let ((parms (instantiate-url path "/test1/:a/:b/:c/:d")))
+    (message (format "We Be in th-controller-test1: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
+
+(defun th-controller-test2 (path)
+  (let ((parms (instantiate-url path "/test2/:a/:b/:c/:d")))
+    (message (format "We Be in thd-controller-test2: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
+
+(require 'supergenpass)
+(defun th-controller-pwgen (path)
+
+v
+  )
+
+
+
+;; End of Examples
+
+;; Stop previous server;; Remove when done with testing.
 (elnode-stop 8028)
 
-(defun my-elnode-hello-world-handler (httpcon)
+(defun th-event-handler (httpcon)
   (elnode-http-start httpcon 200 '("Content-Type" . "text/html"))
   (elnode-http-return
    httpcon
-   (controller-dispatcher (elnode-http-pathinfo httpcon))))
+   (th-controller-dispatcher (elnode-http-pathinfo httpcon))))
 
-(defun controller-dispatcher (path)
+(defun th-controller-dispatcher (path)
   "Find a function corresponding to controller name and call it with the args"
-  (let ((controller (intern (format "my-controller-%s" (get-controller-from-path path)))))
+  (let ((controller (intern (format "th-controller-%s" (th-get-controller-from-path path)))))
     (if
         (fboundp controller)
         (funcall controller path)
       (message (format "<font color=red>No controller found named %s</font>" controller)))))
 
-(defun my-controller-test1 (path)
-  (let ((parms (instantiate-url path "/test1/:a/:b/:c/:d")))
-    (message (format "We Be in my-controller-test1: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
+(defun th-get-controller-from-path (path)
+  (th-get-value-by-name path "/:controller/" 'controller))
 
-
-(defun my-controller-test2 (path)
-  (let ((parms (instantiate-url path "/test2/:a/:b/:c/:d")))
-    (message (format "We Be in my-controller-test2: and got got %s a:%s b:%s" path (val 'a) (val 'b)))))
-
-
-(defun get-controller-from-path (path)
-  (get-value-by-name path "/:controller/" 'controller))
-
-(defun val (i)
+(defun th-v (i)
+  "Small function to help cleanup the templates"
   (cdr (assoc i parms))
   )
 
-(defun get-value-by-name (path pattern name)
+(defun th-get-value-by-name (path pattern name)
   "Return the entry if we find it, otherwise nil"
   (cdr (assoc name (instantiate-url path pattern))))
 
-(defun instantiate-url (path pattern)
+(defun th-parse-path (path pattern)
   (let* ((lst (split-string pattern "/" t))
          (patlst
           (let ((i 1))
@@ -85,4 +98,4 @@
             collect (cons (aget patlst i) part)
             do (setq i (+ i 1))))))
 
-(elnode-start 'my-elnode-hello-world-handler :port 8028 :host "localhost")
+(elnode-start 'th-event-handler :port 8028 :host "localhost")
