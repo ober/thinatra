@@ -120,3 +120,5 @@
             do (setq i (+ i 1))))))
 
 (elnode-start 'th-event-handler :port 8028 :host "localhost")
+
+(provide 'thinatra)
