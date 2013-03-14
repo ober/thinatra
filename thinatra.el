@@ -33,8 +33,9 @@
 
 ;;; Code:
 
-;; Example Functions that handle calls to rest endpoints can be found
-;; in examples.el
+;; Example Functions that handle calls to rest endpoints can be found in examples.el
+
+(require 'elnode)
 
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
