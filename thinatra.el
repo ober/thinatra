@@ -33,57 +33,20 @@
 
 ;;; Code:
 
-;; Example Functions that handle calls to rest endpoints
-;; e.g.
+;; Example Functions that handle calls to rest endpoints can be found
+;; in examples.el
 
-(defun th-controller-test1 (path)
-  (let ((parms (th-parse-path path "/test1/:a/:b/:c/:d")))
-    (message (format "We Be in th-controller-test1: and got got %s a:%s b:%s" path (th-v 'a) (th-v 'b)))))
-
-(defun th-controller-test2 (path)
-  (let ((parms (th-parse-path path "/test2/:a/:b/:c/:d")))
-    (message (format "We Be in thd-controller-test2: and got got %s a:%s b:%s" path (th-v 'a) (th-v 'b)))))
-
-(defun th-controller-sum (path)
-  (let ((parms (th-parse-path path "/sum/:a/:b")))
-    (message
-     (format "%i"
-             (+ (string-to-number (th-v 'a))
-                (string-to-number (th-v 'b)))))))
-
-(defun th-controller-pwgen (path)
-  "open http://localhost:8028/pwgen to get a random password each time"
-
-  ;; Following functions taken from http://github.com/ober/sgpass
-  (defun b64-md5 (pickle)
-    "Encrypt the string given to us as Base64 encoded Md5 byte stream"
-    (replace-regexp-in-string "=" "A" (replace-regexp-in-string "+" "9" (replace-regexp-in-string "/" "8" (base64-encode-string (secure-hash 'md5 pickle nil nil t))))))
-
-  (defun sgp-generate (password domain)
-    "Create a unique password for a given domain and master password"
-    (let ((i 0) (results (format "%s:%s" password domain)))
-      (setq results (format "%s:%s" password domain))
-      (while
-          (not (and (> i 9) (secure-enough results 10)))
-        (setq results (b64-md5 results))
-        (setq i (1+ i)))
-      (substring results 0 10)))
-
-  (defun secure-enough (results len)
-    "Ensure the password we have is sufficiently secure"
-    (let
-        ((case-fold-search nil))
-      (and
-       (> (length results) len)
-       (string-match "[0-9]" (substring results 0 len))
-       (string-match "[A-Z]" (substring results 0 len))
-       (string-match "^[a-z]" (substring results 0 len)))))
-  (message (format "<h1>%s</h1>" (sgp-generate  (random 1000000) (random 1000000)))))
-
-;; End of Examples
-
-;; Stop previous server;; Remove when done with testing.
-(elnode-stop 8028)
+(defmacro get (pattern &rest forms)
+  (declare (indent defun))
+  (let ((fun-name (intern (format "th-controller-%s" (th-get-controller-from-path pattern))))
+        (parms '(th-parse-path path pattern)))
+    `(progn
+       (defun ,fun-name (path)
+         (let ((parms (th-parse-path path ,pattern)))
+           (loop for (var . val) in parms
+                 do
+                 (set var val))
+           ,@forms)))))
 
 (defun th-event-handler (httpcon)
   (elnode-http-start httpcon 200 '("Content-Type" . "text/html"))
@@ -93,6 +56,7 @@
 
 (defun th-controller-dispatcher (path)
   "Find a function corresponding to controller name and call it with the args"
+  (message (format "got dispatcher with %s" path))
   (let ((controller (intern (format "th-controller-%s" (th-get-controller-from-path path)))))
     (if
         (fboundp controller)
@@ -125,7 +89,5 @@
             if (aget patlst i)
             collect (cons (aget patlst i) part)
             do (setq i (+ i 1))))))
-
-(elnode-start 'th-event-handler :port 8028 :host "localhost")
 
 (provide 'thinatra)
