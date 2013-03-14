@@ -15,9 +15,5 @@
              (+ (string-to-number a)
                 (string-to-number b)))))
 
-(get "/pwgen/"
-  
-
-  )
 
 (elnode-start 'th-event-handler :port 8021 :host "localhost")
