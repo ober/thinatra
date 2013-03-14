@@ -42,7 +42,7 @@
         (parms '(th-parse-path path pattern)))
     `(progn
        (defun ,fun-name (path)
-         (let ((parms (th-parse-path path ,pattern)))
+         (let ((parms (th-parse-path path ,pattern)) (controller (format "th-controller-%s" (th-get-controller-from-path pattern))))
            (loop for (var . val) in parms
                  do
                  (set var val))
