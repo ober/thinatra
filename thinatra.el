@@ -67,11 +67,6 @@
 (defun th-get-controller-from-path (path)
   (th-get-value-by-name path "/:controller/" 'controller))
 
-(defun th-v (i)
-  "Syntactic sugar"
-  (cdr (assoc i parms))
-  )
-
 (defun th-get-value-by-name (path pattern name)
   "Return the entry if we find it, otherwise nil"
   (cdr (assoc name (th-parse-path path pattern))))
