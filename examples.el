@@ -1,7 +1,5 @@
 (require 'thinatra)
 
-(elnode-stop 8021)
-
 ;; hello world
 (get "/helloworld"
   "Hello world!")
@@ -38,9 +36,9 @@
 
 ;; Add two numbers
 (get "/sum/:a/:b"
-  (message 
+  (message
    (format "%i"
            (+ (string-to-number a)
               (string-to-number b)))))
 
-(elnode-start 'th-event-handler :port 8021 :host "localhost")
+(th-server-start 8021 "localhost")
