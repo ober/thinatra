@@ -86,4 +86,9 @@
             collect (cons (aget patlst i) part)
             do (setq i (+ i 1))))))
 
+(defun th-server-start (port host)
+  "Wrapper for elnode stop/start on a given port"
+  (elnode-stop port)
+  (elnode-start 'th-event-handler :port port :host host))
+
 (provide 'thinatra)
