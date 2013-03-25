@@ -19,12 +19,12 @@
 ;; Talk to the doctor;;
 ;; Need to figure out how to redirect output to web page.
 (get "/doctor"
-  (doctor))
+  (with-stdout-to-elnode httpcon (doctor)))
 
 ;; Show my daily agenda
 ;; Need to figure out how to redirect output to web page.
 (get "/agenda/:days"
-  (org-agenda-list days))
+  (with-stdout-to-elnode httpcon (org-agenda-list days)))
 
 ;; generate random secure password
 ;;(require 'supergenpass) ;; http://github.com/ober/sgpass
