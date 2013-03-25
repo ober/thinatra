@@ -77,7 +77,7 @@
   (cdr (assoc name (th-parse-path path pattern))))
 
 (defun th-parse-path (path pattern)
-  (let* ((splat ()) (lst (split-string pattern "/" t))
+  (let* ((lst (split-string pattern "/" t))
          (patlst
           (let ((i 1))
             (loop for part in lst
