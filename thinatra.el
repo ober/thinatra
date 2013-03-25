@@ -66,7 +66,8 @@
     (if
         (fboundp controller)
         (funcall controller path)
-      (message (format "<font color=red>No controller found named %s</font>" (replace-regexp-in-string "^th-controller-" "" (format "%s" controller)))))))
+      (message (format "<b>Error: No controller found named <font color=red>%s</font></b>"
+                       (replace-regexp-in-string "^th-controller-" "" (format "%s" controller)))))))
 
 (defun th-get-controller-from-path (path)
   (th-get-value-by-name path "/:controller/" 'controller))
