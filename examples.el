@@ -33,14 +33,11 @@
 
 ;; Show all of the vars passed in.
 (get "/test1/:a/:b/:c/:d"
-  (message
-   (format
-    "we are in controller:%s a:%s b:%s c:%s d:%s"
-    controller a b c d )))
+    (format "we are in controller:%s a:%s b:%s c:%s d:%s" controller a b c d ))
 
 ;; Route patterns may also include splat (or wildcar) parameters
 (get "/say/*/to/*"
-  (message splat))
+  splat)
 
 ;; Add two numbers
 (get "/sum/:a/:b"

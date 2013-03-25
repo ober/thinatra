@@ -1,5 +1,7 @@
 ;;; thinatra.el --- Sinatra clone for Emacs (a poor one at that)
 
+;;; -*- lexical-binding: t -*-
+
 ;; Copyright (C) 2013  Jaime Fournier <jaimef@linbsd.org>
 
 ;; Author: Jaime Fournier <jaimef@linbsd.org>
@@ -43,15 +45,17 @@
         (parms '(th-parse-path path pattern)))
     `(progn
        (defun ,fun-name (path)
-         (let ((parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern))) (controller (format "th-controller-%s" (th-get-controller-from-path ,pattern))))
+         (let ((parms
+                (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
+               (controller (format "th-controller-%s" (th-get-controller-from-path ,pattern))))
            (loop for (var . val) in parms
                  do
                  (set var ""))
            (loop for (var . val) in parms
                  do
-                   (if (boundp 'var)
-                       (set var (format "%s %s" (eval var) val))
-                     (set var val)))
+                 (if (boundp 'var)
+                     (set var (format "%s %s" (eval var) val))
+                   (set var val)))
            ,@forms)))))
 
 (defun th-event-handler (httpcon)
@@ -59,6 +63,11 @@
   (elnode-http-return
    httpcon
    (th-controller-dispatcher (elnode-http-pathinfo httpcon))))
+
+(defun th-root-handler (httpcon)
+  (elnode-hostpath-dispatcher httpcon
+                              '((".*/favicon.ico" . elnode-send-404)
+                                (".*" . th-event-handler))))
 
 (defun th-controller-dispatcher (path)
   "Find a function corresponding to controller name and call it with the args"
@@ -94,6 +103,6 @@
 (defun th-server-start (port host)
   "Wrapper for elnode stop/start on a given port"
   (elnode-stop port)
-  (elnode-start 'th-event-handler :port port :host host))
+  (elnode-start 'th-root-handler :port port :host host))
 
 (provide 'thinatra)
