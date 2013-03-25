@@ -43,10 +43,15 @@
         (parms '(th-parse-path path pattern)))
     `(progn
        (defun ,fun-name (path)
-         (let ((parms (th-parse-path path ,pattern)) (controller (format "th-controller-%s" (th-get-controller-from-path ,pattern))))
+         (let ((parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern))) (controller (format "th-controller-%s" (th-get-controller-from-path ,pattern))))
            (loop for (var . val) in parms
                  do
-                 (set var val))
+                 (set var ""))
+           (loop for (var . val) in parms
+                 do
+                   (if (boundp 'var)
+                       (set var (format "%s %s" (eval var) val))
+                     (set var val)))
            ,@forms)))))
 
 (defun th-event-handler (httpcon)
@@ -57,7 +62,6 @@
 
 (defun th-controller-dispatcher (path)
   "Find a function corresponding to controller name and call it with the args"
-  (message (format "got dispatcher with %s" path))
   (let ((controller (intern (format "th-controller-%s" (th-get-controller-from-path path)))))
     (if
         (fboundp controller)
@@ -72,19 +76,19 @@
   (cdr (assoc name (th-parse-path path pattern))))
 
 (defun th-parse-path (path pattern)
-  (let* ((lst (split-string pattern "/" t))
+  (let* ((splat ()) (lst (split-string pattern "/" t))
          (patlst
           (let ((i 1))
             (loop for part in lst
                   if (string-match-p "^:.*" part)
                   collect (cons i (intern (substring part 1)))
-                  do (setq i (+ 1 i)))))
+                  do (setq i (1+ i)))))
          (splt (split-string path "/")))
     (let ((i 0))
       (loop for part in splt
             if (aget patlst i)
             collect (cons (aget patlst i) part)
-            do (setq i (+ i 1))))))
+            do (setq i (1+ i))))))
 
 (defun th-server-start (port host)
   "Wrapper for elnode stop/start on a given port"

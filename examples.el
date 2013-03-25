@@ -1,5 +1,9 @@
 (require 'thinatra)
 
+;; Basic page
+(get "/"
+  "Welcome to Thinatra!")
+
 ;; hello world
 (get "/helloworld"
   "Hello world!")
@@ -34,11 +38,15 @@
     "we are in controller:%s a:%s b:%s c:%s d:%s"
     controller a b c d )))
 
+;; Route patterns may also include splat (or wildcar) parameters
+(get "/say/*/to/*"
+  (message splat))
+
 ;; Add two numbers
 (get "/sum/:a/:b"
-  (message
-   (format "%i"
-           (+ (string-to-number a)
-              (string-to-number b)))))
+  (number-to-string
+   (+
+    (string-to-number a)
+    (string-to-number b))))
 
-(th-server-start 8021 "localhost")
+(th-server-start 8021 "0.0.0.0")
