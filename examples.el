@@ -39,6 +39,10 @@
 (get "/say/*/to/*"
   splat)
 
+;; Use ruby-esque string interpolation. (this sucked to do)
+(get "/hello/:a/:b/:c"
+  "Hello to #{a} and #{b} and #{c}")
+
 ;; Add two numbers
 (get "/sum/:a/:b"
   (number-to-string
