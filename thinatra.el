@@ -56,7 +56,27 @@
                  (if (boundp 'var)
                      (set var (format "%s %s" (eval var) val))
                    (set var val)))
-           ,@forms)))))
+           (th-interpose-like-ruby
+                                   ,@forms))))))
+
+(defun th-interpose-get-vars (str)
+  (let ((result nil))
+    (with-temp-buffer
+      (insert str)
+      (goto-char
+       (point-min))
+      (while (re-search-forward "#{\\([^}]*\\)}" nil t)
+        (setq result
+              (cons
+               (intern (match-string 1))
+               result)))
+      (reverse result))))
+
+(defun th-interpose-get-format (str)
+  (replace-regexp-in-string "#{.[^#]*}" "%s" str))
+
+(defun th-interpose-like-ruby (str)
+  (apply #'format (th-interpose-get-format str) (mapcar #'symbol-value (th-interpose-get-vars str))))
 
 (defun th-event-handler (httpcon)
   (elnode-http-start httpcon 200 '("Content-Type" . "text/html"))
