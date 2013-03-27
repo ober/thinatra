@@ -76,15 +76,18 @@
   (replace-regexp-in-string "#{.[^#]*}" "%s" str))
 
 (defun th-interpose-like-ruby (str)
+  "Thinatra ruby like interposition for strings"
   (apply #'format (th-interpose-get-format str) (mapcar #'symbol-value (th-interpose-get-vars str))))
 
 (defun th-event-handler (httpcon)
+  "Thinatra event handler"
   (elnode-http-start httpcon 200 '("Content-Type" . "text/html"))
   (elnode-http-return
    httpcon
    (th-controller-dispatcher (elnode-http-pathinfo httpcon))))
 
 (defun th-root-handler (httpcon)
+  "Thinatra root handler"
   (elnode-hostpath-dispatcher httpcon
                               '((".*/favicon.ico" . elnode-send-404)
                                 (".*" . th-event-handler))))
