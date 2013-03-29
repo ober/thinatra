@@ -58,7 +58,7 @@
                      (set var (format "%s %s" (eval var) val))
                    (set var val)))
            (ris
-                                   ,@forms))))))
+            ,@forms))))))
 
 (defun th-event-handler (httpcon)
   "Thinatra event handler"
