@@ -38,6 +38,7 @@
 ;; Example Functions that handle calls to rest endpoints can be found in examples.el
 
 (require 'elnode)
+(require 'rubyinterpol)
 
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
@@ -56,28 +57,8 @@
                  (if (boundp 'var)
                      (set var (format "%s %s" (eval var) val))
                    (set var val)))
-           (th-interpose-like-ruby
+           (ris
                                    ,@forms))))))
-
-(defun th-interpose-get-vars (str)
-  (let ((result nil))
-    (with-temp-buffer
-      (insert str)
-      (goto-char
-       (point-min))
-      (while (re-search-forward "#{\\([^}]*\\)}" nil t)
-        (setq result
-              (cons
-               (intern (match-string 1))
-               result)))
-      (reverse result))))
-
-(defun th-interpose-get-format (str)
-  (replace-regexp-in-string "#{.[^#]*}" "%s" str))
-
-(defun th-interpose-like-ruby (str)
-  "Thinatra ruby like interposition for strings"
-  (apply #'format (th-interpose-get-format str) (mapcar #'symbol-value (th-interpose-get-vars str))))
 
 (defun th-event-handler (httpcon)
   "Thinatra event handler"
