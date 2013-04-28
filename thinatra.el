@@ -42,13 +42,13 @@
 
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
-  (let ((fun-name (intern (format "th-controller-%s" (th-get-controller-from-path pattern))))
+  (let ((fun-name (intern (format "th-controller-%s" (th-controller-from-path pattern))))
         (parms '(th-parse-path path pattern)))
     `(progn
        (defun ,fun-name (path)
          (let ((parms
                 (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
-               (controller (format "th-controller-%s" (th-get-controller-from-path ,pattern))))
+               (controller (format "th-controller-%s" (th-controller-from-path ,pattern))))
            (loop for (var . val) in parms
                  do
                  (set var ""))
@@ -75,17 +75,17 @@
 
 (defun th-controller-dispatcher (path)
   "Find a function corresponding to controller name and call it with the args"
-  (let ((controller (intern (format "th-controller-%s" (th-get-controller-from-path path)))))
+  (let ((controller (intern (format "th-controller-%s" (th-controller-from-path path)))))
     (if
         (fboundp controller)
         (funcall controller path)
       (message (format "<b>Error: No controller found named <font color=red>%s</font></b>"
                        (replace-regexp-in-string "^th-controller-" "" (format "%s" controller)))))))
 
-(defun th-pull-controller-from-path (path)
-  (th-get-value-by-name path "/:controller/" 'controller))
+(defun th-controller-from-path (path)
+  (th-value-by-name path "/:controller/" 'controller))
 
-(defun th-pull-value-by-name (path pattern name)
+(defun th-value-by-name (path pattern name)
   "Return the entry if we find it, otherwise nil"
   (cdr (assoc name (th-parse-path path pattern))))
 
