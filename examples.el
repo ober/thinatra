@@ -14,7 +14,7 @@
 
 ;; Hello name/city
 (get "/hello/:name/:city"
-  "Hey there #{name} from #{city}")
+  (format "hey there %s from %s" name city))
 
 ;; Talk to the doctor;;
 ;; Need to figure out how to redirect output to web page.
@@ -99,5 +99,6 @@
    (+
     (string-to-number a)
     (string-to-number b))))
+
 
 (th-server-start 8021 "0.0.0.0")

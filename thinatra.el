@@ -48,17 +48,19 @@
        (defun ,fun-name (path)
          (let ((parms
                 (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
-               (controller (format "th-controller-%s" (th-controller-from-path ,pattern))))
+               (controller (format "th-controller-%s" (th-controller-from-path ,pattern))
+
+                           ))
            (loop for (var . val) in parms
                  do
                  (set var ""))
            (loop for (var . val) in parms
                  do
-                 (if (boundp 'var)
-                     (set var (format "%s %s" (eval var) val))
-                   (set var val)))
-           (ris
-            ,@forms))))))
+                 (set var val)
+                 ;;                 (if (boundp 'var))
+                 ;;                 (set var (format "%s %s" (eval var) val))
+
+                  ,@forms))))))
 
 (defun th-event-handler (httpcon)
   "Thinatra event handler"
