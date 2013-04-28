@@ -82,10 +82,10 @@
       (message (format "<b>Error: No controller found named <font color=red>%s</font></b>"
                        (replace-regexp-in-string "^th-controller-" "" (format "%s" controller)))))))
 
-(defun th-get-controller-from-path (path)
+(defun th-pull-controller-from-path (path)
   (th-get-value-by-name path "/:controller/" 'controller))
 
-(defun th-get-value-by-name (path pattern name)
+(defun th-pull-value-by-name (path pattern name)
   "Return the entry if we find it, otherwise nil"
   (cdr (assoc name (th-parse-path path pattern))))
 
