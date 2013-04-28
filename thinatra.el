@@ -6,7 +6,7 @@
 
 ;; Author: Jaime Fournier <jaimef@linbsd.org>
 ;; Keywords: Thinatra
-;; Version: 0.1
+;; Version: 0.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -46,21 +46,9 @@
         (parms '(th-parse-path path pattern)))
     `(progn
        (defun ,fun-name (path)
-         (let ((parms
-                (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
-               (controller (format "th-controller-%s" (th-controller-from-path ,pattern))
-
-                           ))
-           (loop for (var . val) in parms
-                 do
-                 (set var ""))
-           (loop for (var . val) in parms
-                 do
-                 (set var val)
-                 ;;                 (if (boundp 'var))
-                 ;;                 (set var (format "%s %s" (eval var) val))
-
-                  ,@forms))))))
+         (let ((parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
+               (controller (format "th-controller-%s" (th-controller-from-path ,pattern))))
+           (ria ,@forms parms))))))
 
 (defun th-event-handler (httpcon)
   "Thinatra event handler"
