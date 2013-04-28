@@ -38,7 +38,6 @@
 ;; Example Functions that handle calls to rest endpoints can be found in examples.el
 
 (require 'elnode)
-(require 'rubyinterpol)
 
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
@@ -48,7 +47,7 @@
        (defun ,fun-name (path)
          (let ((parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
                (controller (format "th-controller-%s" (th-controller-from-path ,pattern))))
-           (ria ,@forms parms))))))
+           ,@forms)))))
 
 (defun th-event-handler (httpcon)
   "Thinatra event handler"
