@@ -14,7 +14,7 @@
 
 ;; Hello name/city
 (get "/hello/:name/:city"
-  (format "hey there %s from %s" name city))
+  "hey there #{name} from #{city}")
 
 ;; Talk to the doctor;;
 ;; Need to figure out how to redirect output to web page.
@@ -40,11 +40,11 @@
   splat)
 
 ;; Evaluate Go-lang Fibonacci
-(require 'das-ich)
-(get-go "/fib/:number"
-  "
-  ;; (setq code
-;;    (ris "
+;; (require 'das-ich)
+;; (get-go "/fib/:number"
+;;   "
+;;   ;; (setq code
+;; ;;    (ris "
 ;; package main
 
 ;; import (
@@ -89,9 +89,7 @@
 ;; }
 ;; "
 ;; "1"
-  )
-
-
+;;  )
 
 ;; Add two numbers
 (get "/sum/:a/:b"
@@ -99,6 +97,5 @@
    (+
     (string-to-number a)
     (string-to-number b))))
-
 
 (th-server-start 8021 "0.0.0.0")
