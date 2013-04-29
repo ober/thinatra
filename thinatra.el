@@ -41,20 +41,29 @@
 
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
-  (let ((fun-name (intern (format "th-controller-%s" (th-controller-from-path pattern))))
+  (let ((fun-name (intern (format "th-get-%s" (th-controller-from-path pattern))))
         (parms '(th-parse-path path pattern)))
     `(progn
        (defun ,fun-name (path)
          (let ((parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
-               (controller (format "th-controller-%s" (th-controller-from-path ,pattern))))
+               (controller (format "th-get-%s" (th-controller-from-path ,pattern))))
            ,@forms)))))
+
+(defmacro post (pattern &rest forms)
+  (declare (indent defun))
+  (let (
+        (fun-name (intern (format "th-post-%s" (th-controller-from-path pattern))))
+        )
+    `(progn
+       (defun ,fun-name (httpcon)
+           ,@forms))))
 
 (defun th-event-handler (httpcon)
   "Thinatra event handler"
   (elnode-http-start httpcon 200 '("Content-Type" . "text/html"))
   (elnode-http-return
    httpcon
-   (th-controller-dispatcher (elnode-http-pathinfo httpcon))))
+   (th-controller-dispatcher httpcon)))
 
 (defun th-root-handler (httpcon)
   "Thinatra root handler"
@@ -62,12 +71,21 @@
                               '((".*/favicon.ico" . elnode-send-404)
                                 (".*" . th-event-handler))))
 
-(defun th-controller-dispatcher (path)
+(defun th-controller-dispatcher (httpcon)
   "Find a function corresponding to controller name and call it with the args"
-  (let ((controller (intern (format "th-controller-%s" (th-controller-from-path path)))))
+  (let (
+        (path (elnode-http-pathinfo httpcon))
+        (method (elnode-http-method httpcon))
+        (params (elnode-http-params httpcon))
+        (controller (intern (format "th-%s-%s" (downcase method) (th-controller-from-path path))))
+        )
+    (message "XXX: controller:%s params:%s" controller params)
     (if
         (fboundp controller)
-        (funcall controller path)
+        (if (not (equal "post" method))
+            (funcall controller path)
+          (funcall controller httpcon)
+          )
       (message (format "<b>Error: No controller found named <font color=red>%s</font></b>"
                        (replace-regexp-in-string "^th-controller-" "" (format "%s" controller)))))))
 

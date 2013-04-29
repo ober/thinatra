@@ -14,7 +14,10 @@
 
 ;; Hello name/city
 (get "/hello/:name/:city"
-  "hey there #{name} from #{city}")
+  (ria "GET! hey there #{name} from #{city}" parms))
+
+(post "/hello/:name/:city"
+  (format "params:%s" params)
 
 ;; Talk to the doctor;;
 ;; Need to figure out how to redirect output to web page.
