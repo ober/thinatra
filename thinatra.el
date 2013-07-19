@@ -45,15 +45,16 @@
         (parms '(th-parse-path path pattern)))
     `(progn
        (defun ,fun-name (path)
-         (let ((parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
-               (controller (format "th-get-%s" (th-controller-from-path ,pattern))))
-           ,@forms)))))
+         (let* (
+               (parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
+               (controller (format "th-get-%s" (th-controller-from-path ,pattern)))
+               `(loop for (var . val) in parms
+                     do (set var val)))
+               ,@forms)))))
 
 (defmacro post (pattern &rest forms)
   (declare (indent defun))
-  (let (
-        (fun-name (intern (format "th-post-%s" (th-controller-from-path pattern))))
-        )
+  (let ((fun-name (intern (format "th-post-%s" (th-controller-from-path pattern)))))
     `(progn
        (defun ,fun-name (httpcon)
            ,@forms))))
@@ -73,19 +74,17 @@
 
 (defun th-controller-dispatcher (httpcon)
   "Find a function corresponding to controller name and call it with the args"
-  (let (
+  (let* (
         (path (elnode-http-pathinfo httpcon))
         (method (elnode-http-method httpcon))
         (params (elnode-http-params httpcon))
-        (controller (intern (format "th-%s-%s" (downcase method) (th-controller-from-path path))))
-        )
+        (controller (intern (format "th-%s-%s" (downcase method) (th-controller-from-path path)))))
     (message "XXX: controller:%s params:%s" controller params)
     (if
         (fboundp controller)
         (if (not (equal "post" method))
             (funcall controller path)
-          (funcall controller httpcon)
-          )
+          (funcall controller httpcon))
       (message (format "<b>Error: No controller found named <font color=red>%s</font></b>"
                        (replace-regexp-in-string "^th-controller-" "" (format "%s" controller)))))))
 
