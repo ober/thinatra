@@ -7,3 +7,4 @@
 <bpalmer> untested
 <bpalmer> (whatever path-template) would be (and (string-match "/\\([^/]*\\)"
           path-template) (match-string 1 path-template))   or the like.
+<bpalmer> consider defget  and defput
