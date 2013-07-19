@@ -1,4 +1,5 @@
 (require 'thinatra)
+(require 'rubyinterpol)
 
 ;; Basic page
 (get "/"
