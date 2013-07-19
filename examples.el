@@ -37,7 +37,7 @@
 
 ;; Show all of the vars passed in.
 (get "/test1/:a/:b/:c/:d"
-  "We are in #{controller} a:#{a} b:#{b} c:#{c} d:#{d}")
+ (ria "We are in #{controller} a:#{a} b:#{b} c:#{c} d:#{d}" parms))
 
 ;; Route patterns may also include splat (or wildcar) parameters
 (get "/say/*/to/*"
