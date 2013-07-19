@@ -1,0 +1,9 @@
+<bpalmer> no, I mean, something like (defmacro define-get-handler
+          (path-template &rest forms) (let (name (whatever path-template)
+          (parameters (let ((components (split-string path-template "/"))
+          (parameters (loop for c in components if (string-match "^:\\(.*\\)"
+          c) collect (match-string 1 c)))) parameters)))  `(defun ,name
+          (,@parameters) ,@forms))  [01:32]
+<bpalmer> untested
+<bpalmer> (whatever path-template) would be (and (string-match "/\\([^/]*\\)"
+          path-template) (match-string 1 path-template))   or the like.
