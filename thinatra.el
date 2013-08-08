@@ -38,6 +38,8 @@
 ;; Example Functions that handle calls to rest endpoints can be found in examples.el
 
 (require 'elnode)
+(require 'cl)
+(require 'assoc)
 
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
@@ -79,7 +81,7 @@
         (method (elnode-http-method httpcon))
         (params (elnode-http-params httpcon))
         (controller (intern (format "th-%s-%s" (downcase method) (th-controller-from-path path)))))
-    (message "XXX: controller:%s params:%s" controller params)
+    ;;(message "XXX: controller:%s params:%s" controller params)
     (if
         (fboundp controller)
         (if (not (equal "post" method))
