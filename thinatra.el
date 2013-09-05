@@ -118,4 +118,13 @@
   (elnode-stop port)
   (elnode-start 'th-root-handler :port port :host host))
 
+(defun request.cookies () (elnode-http-cookies httpcon ))           ;; hash of browser cookies
+
+(defun request.env (x) (elnode-http-header httpcon x))
+(th-server-start 8099 "127.0.0.1")
+
+(defun request.get? (eq elnode-http-method "get"))
+
+(defun request.ip (httpcon) (elnode-http-parms httpcon))
+
 (provide 'thinatra)
