@@ -6,7 +6,7 @@
 
 ;; Author: Jaime Fournier <jaimef@linbsd.org>
 ;; Keywords: Thinatra
-;; Version: 0.2
+;; Version: 0.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -48,18 +48,18 @@
     `(progn
        (defun ,fun-name (path)
          (let* (
-               (parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
-               (controller (format "th-get-%s" (th-controller-from-path ,pattern)))
-               `(loop for (var . val) in parms
-                     do (set var val)))
-               ,@forms)))))
+                (parms (th-parse-path path (replace-regexp-in-string "*" ":splat" ,pattern)))
+                (controller (format "th-get-%s" (th-controller-from-path ,pattern)))
+                `(loop for (var . val) in parms
+                       do (set var val)))
+           ,@forms)))))
 
 (defmacro post (pattern &rest forms)
   (declare (indent defun))
   (let ((fun-name (intern (format "th-post-%s" (th-controller-from-path pattern)))))
     `(progn
        (defun ,fun-name (httpcon)
-           ,@forms))))
+         ,@forms))))
 
 (defun th-event-handler (httpcon)
   "Thinatra event handler"
@@ -76,19 +76,20 @@
 
 (defun th-controller-dispatcher (httpcon)
   "Find a function corresponding to controller name and call it with the args"
-  (let* (
-        (path (elnode-http-pathinfo httpcon))
-        (method (elnode-http-method httpcon))
-        (params (elnode-http-params httpcon))
-        (controller (intern (format "th-%s-%s" (downcase method) (th-controller-from-path path)))))
-    ;;(message "XXX: controller:%s params:%s" controller params)
-    (if
-        (fboundp controller)
-        (if (not (equal "post" method))
-            (funcall controller path)
-          (funcall controller httpcon))
-      (message (format "<b>Error: No controller found named <font color=red>%s</font></b>"
-                       (replace-regexp-in-string "^th-controller-" "" (format "%s" controller)))))))
+  (let* ((path (elnode-http-pathinfo httpcon))
+         (unless (boundp 'thinatra-missing-controller)
+           (thinatra-missing-controller
+          (format "<b>Error: No controller found named <font color=red>%s</font></b>") (replace-regexp-in-string "^th-controller-" "" (format "%s" controller))))
+         (method (elnode-http-method httpcon)))
+    (params (elnode-http-params httpcon))
+    (controller (intern (format "th-%s-%s" (downcase method) (th-controller-from-path path)))))
+  ;;(message "XXX: controller:%s params:%s" controller params)
+  (if
+      (fboundp controller)
+      (if (not (equal "post" method))
+          (funcall controller path)
+        (funcall controller httpcon))
+    (message "%s" thinatra-missing-controller)))
 
 (defun th-controller-from-path (path)
   (th-value-by-name path "/:controller/" 'controller))
