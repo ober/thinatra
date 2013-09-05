@@ -1,15 +1,15 @@
 ;; called with
 ; emacs -Q --eval '(load-file "~/.emacs.d/jsonip.el")'
 
-(setq debug-on-error nil)
-(setq debug-init nil)
-(setq debug-on-quit nil)
-(setq stack-trace-on-error nil)
+(setq debug-on-error t)
+(setq debug-init t)
+(setq debug-on-quit t)
+(setq stack-trace-on-error t)
 
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))
 
-(setq package-archives '())
+(setq pahinckage-archives '())
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
@@ -46,3 +46,6 @@
 
 (get "/usage"
   (message "cons-cells-consed:%s floats-consed:%s vector-cells-consed:%s symbols-consed:%s string-chars-consed:%s misc-objects-consed:%s intervals-consed:%s strings-consed:%s" cons-cells-consed floats-consed vector-cells-consed symbols-consed string-chars-consed misc-objects-consed intervals-consed strings-consed))
+
+(get "/ipwtf"
+  (message "%s"  (print (elnode-http-headers httpcon))))
