@@ -41,6 +41,10 @@
 (require 'cl)
 (require 'assoc)
 
+(unless (boundp 'thinatra-missing-controller)
+  (thinatra-missing-controller
+   (format "<b>Error: No controller found named <font color=red>%s</font></b>") (replace-regexp-in-string "^th-controller-" "" (format "%s" controller))))
+
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
   (let ((fun-name (intern (format "th-get-%s" (th-controller-from-path pattern))))
@@ -74,22 +78,19 @@
                               '((".*/favicon.ico" . elnode-send-404)
                                 (".*" . th-event-handler))))
 
+
 (defun th-controller-dispatcher (httpcon)
   "Find a function corresponding to controller name and call it with the args"
   (let* ((path (elnode-http-pathinfo httpcon))
-         (unless (boundp 'thinatra-missing-controller)
-           (thinatra-missing-controller
-          (format "<b>Error: No controller found named <font color=red>%s</font></b>") (replace-regexp-in-string "^th-controller-" "" (format "%s" controller))))
-         (method (elnode-http-method httpcon)))
+         (method (elnode-http-method httpcon))
     (params (elnode-http-params httpcon))
     (controller (intern (format "th-%s-%s" (downcase method) (th-controller-from-path path)))))
-  ;;(message "XXX: controller:%s params:%s" controller params)
   (if
       (fboundp controller)
       (if (not (equal "post" method))
           (funcall controller path)
         (funcall controller httpcon))
-    (message "%s" thinatra-missing-controller)))
+    (message "%s" thinatra-missing-controller))))
 
 (defun th-controller-from-path (path)
   (th-value-by-name path "/:controller/" 'controller))
