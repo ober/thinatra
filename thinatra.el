@@ -41,9 +41,9 @@
 (require 'cl)
 (require 'assoc)
 
-(unless (boundp 'thinatra-missing-controller)
-  (thinatra-missing-controller
-   (format "<b>Error: No controller found named <font color=red>%s</font></b>") (replace-regexp-in-string "^th-controller-" "" (format "%s" controller))))
+ ;; (unless (boundp 'thinatra-missing-controller)
+ ;;  (thinatra-missing-controller
+ ;;   (format "<b>Error: No controller found named <font color=red>%s</font></b>") (replace-regexp-in-string "^th-controller-" "" (format "%s" controller))))
 
 (defmacro get (pattern &rest forms)
   (declare (indent defun))
