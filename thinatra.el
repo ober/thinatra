@@ -1,6 +1,6 @@
+;;; -*- lexical-binding: t -*-
 ;;; thinatra.el --- Sinatra clone for Emacs (a poor one at that)
 
-;;; -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Jaime Fournier <jaimef@linbsd.org>
 
@@ -77,7 +77,6 @@
   (elnode-hostpath-dispatcher httpcon
                               '((".*/favicon.ico" . elnode-send-404)
                                 (".*" . th-event-handler))))
-
 
 (defun th-controller-dispatcher (httpcon)
   "Find a function corresponding to controller name and call it with the args"
